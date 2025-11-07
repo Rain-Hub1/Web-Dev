@@ -3,130 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha IA Classificadora de Código</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-        .container {
-            background: #1e1e1e;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-            width: 100%;
-            max-width: 600px;
-            border: 1px solid #333;
-        }
-        h1 {
-            text-align: center;
-            color: #ffffff;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 200px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            border: 1px solid #444;
-            border-radius: 5px;
-            padding: 12px;
-            background-color: #2b2b2b;
-            color: #f0f0f0;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 14px;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(90deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        button:hover {
-            box-shadow: 0 0 15px rgba(0, 123, 255, 0.6);
-            transform: translateY(-2px);
-        }
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-        #resultado {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            min-height: 30px;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #2b2b2b;
-        }
-    </style>
+    <title>DevHub</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>🤖 IA Classificadora de Código</h1>
-        <textarea id="codigoInput" placeholder="Cole um trecho de código aqui para a IA analisar..."></textarea>
-        <button id="classifyBtn" onclick="classificarCodigo()">Analisar Código</button>
-        <div id="resultado">Aguardando análise...</div>
-    </div>
 
-    <script>
-        const URL_DA_SUA_API = "https://raincreator-ai.hf.space/api/predict/";
+    <header>
+        <nav>
+            <a href="#/home" class="nav-logo">DevHub</a>
+            <div id="nav-links">
+                <a href="#/home">Home</a>
+                <a href="#/new">Novo Arquivo</a>
+                <a href="#/settings" id="settings-link" style="display: none;">Configurações</a>
+                <a href="#" id="logout-button" style="display: none;">Logout</a>
+            </div>
+            <div id="auth-links">
+                <a href="#/login">Login</a>
+                <a href="#/register">Registrar</a>
+            </div>
+        </nav>
+    </header>
 
-        const codigoInput = document.getElementById('codigoInput');
-        const resultadoDiv = document.getElementById('resultado');
-        const classifyBtn = document.getElementById('classifyBtn');
+    <main id="app-root">
+    </main>
 
-        async function classificarCodigo() {
-            const codigo = codigoInput.value;
-            if (!codigo.trim()) {
-                resultadoDiv.textContent = "Por favor, insira um código.";
-                return;
-            }
-
-            resultadoDiv.textContent = '🧠 Analisando...';
-            classifyBtn.disabled = true;
-
-            try {
-                const response = await fetch(URL_DA_SUA_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: [codigo] }) 
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro na comunicação com a API: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                const previsao = result.data[0].label; 
-                
-                resultadoDiv.textContent = `Linguagem Detectada: ${previsao}`;
-
-            } catch (error) {
-                console.error("Erro ao classificar:", error);
-                resultadoDiv.textContent = "❌ Erro ao contatar a IA.";
-            } finally {
-                classifyBtn.disabled = false;
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
