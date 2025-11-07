@@ -23,9 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function router() {
-        const fullHash = window.location.hash || '#/home';
+        const fullHash = window.location.hash || '#/login';
         const [path, query] = fullHash.split('?=');
         const routeHandler = routes[path] || routes['#/home'];
+        appRoot.innerHTML = '';
         routeHandler(query);
         updateNav();
     }
@@ -46,27 +47,33 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         await Parse.User.logOut();
         window.location.hash = '#/login';
-        router();
     });
 
     function renderLogin() {
         appRoot.innerHTML = `
-            <div class="page-container">
-                <h2 class="page-title">Login</h2>
+        <div class="relative py-3 sm:max-w-xs sm:mx-auto">
+            <div class="px-8 py-6 mt-4 text-left bg-gray-800 rounded-xl shadow-lg">
                 <form id="login-form">
-                    <div class="form-group">
-                        <label for="username">Usuário ou E-mail</label>
-                        <input type="text" id="username" required>
+                    <div class="flex flex-col justify-center items-center h-full select-none">
+                        <div class="flex flex-col items-center justify-center gap-2 mb-8">
+                            <p class="m-0 text-xl font-semibold text-white">Login to your Account</p>
+                            <span class="m-0 text-xs max-w-[90%] text-center text-gray-400">Get started with our app, just login and enjoy the experience.</span>
+                        </div>
+                        <div class="w-full flex flex-col gap-2 mb-3">
+                            <label class="font-semibold text-xs text-gray-400">Username</label>
+                            <input id="username" placeholder="Username" class="border rounded-lg px-3 py-2 text-sm w-full outline-none bg-gray-900 text-white border-gray-600 focus:border-blue-500" required />
+                        </div>
+                        <div class="w-full flex flex-col gap-2 mb-4">
+                            <label class="font-semibold text-xs text-gray-400">Password</label>
+                            <input id="password" placeholder="••••••••" class="border rounded-lg px-3 py-2 text-sm w-full outline-none bg-gray-900 text-white border-gray-600 focus:border-blue-500" type="password" required />
+                        </div>
+                        <button type="submit" class="py-2 px-8 bg-blue-600 hover:bg-blue-700 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md rounded-lg">Login</button>
+                        <p class="text-xs text-gray-400 mt-4">Não tem uma conta? <a href="#/register" class="text-blue-400 hover:underline">Clique aqui!</a></p>
                     </div>
-                    <div class="form-group">
-                        <label for="password">Senha</label>
-                        <input type="password" id="password" required>
-                    </div>
-                    <button type="submit" class="button button-primary">Login</button>
-                    <p class="form-link">Não tem uma conta? <a href="#/register">Clique aqui!</a></p>
                 </form>
             </div>
-        `;
+        </div>`;
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
@@ -74,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await Parse.User.logIn(username, password);
                 window.location.hash = '#/home';
-                router();
             } catch (error) {
                 alert(`Erro: ${error.message}`);
             }
@@ -83,26 +89,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderRegister() {
         appRoot.innerHTML = `
-            <div class="page-container">
-                <h2 class="page-title">Registrar</h2>
+        <div class="relative py-3 sm:max-w-xs sm:mx-auto">
+            <div class="px-8 py-6 mt-4 text-left bg-gray-800 rounded-xl shadow-lg">
                 <form id="register-form">
-                    <div class="form-group">
-                        <label for="username">Usuário</label>
-                        <input type="text" id="username" required>
+                    <div class="flex flex-col justify-center items-center h-full select-none">
+                        <div class="flex flex-col items-center justify-center gap-2 mb-8">
+                            <p class="m-0 text-xl font-semibold text-white">Create an Account</p>
+                        </div>
+                        <div class="w-full flex flex-col gap-2 mb-3">
+                            <label class="font-semibold text-xs text-gray-400">Username</label>
+                            <input id="username" placeholder="Username" class="border rounded-lg px-3 py-2 text-sm w-full outline-none bg-gray-900 text-white border-gray-600 focus:border-blue-500" required />
+                        </div>
+                        <div class="w-full flex flex-col gap-2 mb-3">
+                            <label class="font-semibold text-xs text-gray-400">E-mail</label>
+                            <input id="email" placeholder="user@example.com" class="border rounded-lg px-3 py-2 text-sm w-full outline-none bg-gray-900 text-white border-gray-600 focus:border-blue-500" type="email" required />
+                        </div>
+                        <div class="w-full flex flex-col gap-2 mb-4">
+                            <label class="font-semibold text-xs text-gray-400">Password</label>
+                            <input id="password" placeholder="••••••••" class="border rounded-lg px-3 py-2 text-sm w-full outline-none bg-gray-900 text-white border-gray-600 focus:border-blue-500" type="password" required />
+                        </div>
+                        <button type="submit" class="py-2 px-8 bg-blue-600 hover:bg-blue-700 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md rounded-lg">Register</button>
+                        <p class="text-xs text-gray-400 mt-4">Já tem uma conta? <a href="#/login" class="text-blue-400 hover:underline">Clique aqui!</a></p>
                     </div>
-                    <div class="form-group">
-                        <label for="email">E-mail</label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Senha</label>
-                        <input type="password" id="password" required>
-                    </div>
-                    <button type="submit" class="button button-primary">Registrar</button>
-                    <p class="form-link">Já tem uma conta? <a href="#/login">Clique aqui!</a></p>
                 </form>
             </div>
-        `;
+        </div>`;
+
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = new Parse.User();
@@ -112,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await user.signUp();
                 window.location.hash = '#/home';
-                router();
             } catch (error) {
                 alert(`Erro: ${error.message}`);
             }
@@ -121,9 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderHome() {
         appRoot.innerHTML = `
-            <div class="page-container">
-                <h1 class="page-title">Um mundo de possibilidades no desenvolvimento web e app</h1>
-                <div id="files-list">Carregando arquivos...</div>
+            <div class="file-details-container">
+                <h1 class="text-3xl font-bold mb-4">Arquivos Recentes</h1>
+                <div id="files-list">
+                    <p class="text-gray-400">Carregando arquivos...</p>
+                </div>
             </div>
         `;
         const File = Parse.Object.extend("File");
@@ -134,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const files = await query.find();
             const filesList = document.getElementById('files-list');
             if (files.length === 0) {
-                filesList.innerHTML = '<p>Nenhum arquivo encontrado. Crie o primeiro!</p>';
+                filesList.innerHTML = '<p class="text-gray-400">Nenhum arquivo encontrado. Crie o primeiro!</p>';
                 return;
             }
             filesList.innerHTML = files.map(file => `
@@ -149,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         } catch (error) {
-            document.getElementById('files-list').innerHTML = `<p>Erro ao carregar arquivos: ${error.message}</p>`;
+            document.getElementById('files-list').innerHTML = `<p class="text-red-500">Erro ao carregar arquivos: ${error.message}</p>`;
         }
     }
 
@@ -159,20 +172,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         appRoot.innerHTML = `
-            <div class="page-container">
-                <h2 class="page-title">Criar Novo Arquivo</h2>
-                <form id="new-file-form">
-                    <div class="form-group">
-                        <label for="title">Título</label>
-                        <input type="text" id="title" required>
+            <div class="file-details-container">
+                <h2 class="text-2xl font-bold mb-6">Criar Novo Arquivo</h2>
+                <form id="new-file-form" class="space-y-4">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-300">Título</label>
+                        <input type="text" id="title" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
-                    <div class="form-group">
-                        <label for="description">Descrição</label>
-                        <textarea id="description" required></textarea>
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-300">Descrição</label>
+                        <textarea id="description" rows="4" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="code">Código</label>
-                        <textarea id="code"></textarea>
+                    <div>
+                        <label for="code" class="block text-sm font-medium text-gray-300">Código</label>
+                        <textarea id="code" rows="10" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono"></textarea>
                     </div>
                     <button type="submit" class="button button-primary">Salvar</button>
                 </form>
@@ -212,10 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const isOwner = currentUser && owner && currentUser.id === owner.id;
 
             appRoot.innerHTML = `
-                <div class="page-container">
-                    <h2 class="page-title">${file.get('title')}</h2>
-                    <p class="file-details-owner">Por: ${owner?.get('username') || 'Desconhecido'}</p>
-                    <p>${file.get('description')}</p>
+                <div class="file-details-container">
+                    <h2 class="text-3xl font-bold text-white">${file.get('title')}</h2>
+                    <p class="text-sm text-gray-400 mt-1 mb-4">Por: ${owner?.get('username') || 'Desconhecido'}</p>
+                    <p class="text-gray-300 mb-4">${file.get('description')}</p>
                     <pre class="file-details-code"><code>${file.get('code')}</code></pre>
                     <div class="button-group" id="actions-container"></div>
                 </div>
@@ -240,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         } catch (error) {
-            appRoot.innerHTML = `<div class="page-container"><p>Arquivo não encontrado.</p></div>`;
+            appRoot.innerHTML = `<div class="file-details-container"><p class="text-red-500">Arquivo não encontrado.</p></div>`;
         }
     }
 
@@ -258,24 +271,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             appRoot.innerHTML = `
-                <div class="page-container">
-                    <h2 class="page-title">Editar Arquivo</h2>
-                    <form id="edit-file-form">
-                        <div class="form-group">
-                            <label for="title">Título</label>
-                            <input type="text" id="title" value="${file.get('title')}" required>
+                <div class="file-details-container">
+                    <h2 class="text-2xl font-bold mb-6">Editar Arquivo</h2>
+                    <form id="edit-file-form" class="space-y-4">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-300">Título</label>
+                            <input type="text" id="title" value="${file.get('title')}" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
-                        <div class="form-group">
-                            <label for="description">Descrição</label>
-                            <textarea id="description" required>${file.get('description')}</textarea>
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-300">Descrição</label>
+                            <textarea id="description" rows="4" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>${file.get('description')}</textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="code">Código</label>
-                            <textarea id="code">${file.get('code')}</textarea>
+                        <div>
+                            <label for="code" class="block text-sm font-medium text-gray-300">Código</label>
+                            <textarea id="code" rows="10" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono">${file.get('code')}</textarea>
                         </div>
                         <div class="button-group">
                             <button type="submit" class="button button-primary">Salvar</button>
-                            <a href="#/File/Id?=${file.id}" class="button button-secondary">Cancelar</a>
+                            <a href="#/File/Id?=${file.id}" class="button bg-gray-600 hover:bg-gray-700 text-white">Cancelar</a>
                         </div>
                     </form>
                 </div>
@@ -294,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         } catch (error) {
-            appRoot.innerHTML = `<div class="page-container"><p>Arquivo não encontrado.</p></div>`;
+            appRoot.innerHTML = `<div class="file-details-container"><p class="text-red-500">Arquivo não encontrado.</p></div>`;
         }
     }
 
@@ -306,24 +319,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         appRoot.innerHTML = `
-            <div class="page-container">
-                <h2 class="page-title">Configurações de Perfil</h2>
-                <form id="settings-form">
-                    <div class="form-group">
-                        <label for="username">Usuário</label>
-                        <input type="text" id="username" value="${currentUser.get('username')}" required>
+            <div class="file-details-container max-w-lg mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Configurações de Perfil</h2>
+                <form id="settings-form" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-300">Usuário</label>
+                        <input type="text" id="username" value="${currentUser.get('username')}" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
-                    <div class="form-group">
-                        <label for="email">E-mail</label>
-                        <input type="email" id="email" value="${currentUser.get('email')}" required>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">E-mail</label>
+                        <input type="email" id="email" value="${currentUser.get('email')}" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
                     <div class="button-group">
                         <button type="submit" class="button button-primary">Salvar</button>
-                        <a href="#/home" class="button button-secondary">Cancelar</a>
+                        <a href="#/home" class="button bg-gray-600 hover:bg-gray-700 text-white">Cancelar</a>
                     </div>
                 </form>
-                <div class="danger-zone">
-                    <h3>Zona de Perigo</h3>
+                <div class="mt-8 pt-6 border-t border-red-500/30">
+                    <h3 class="text-lg font-semibold text-red-500">Zona de Perigo</h3>
+                    <p class="text-sm text-gray-400 mt-1 mb-4">Esta ação não pode ser desfeita.</p>
                     <button id="delete-account-button" class="button button-danger">Apagar Conta</button>
                 </div>
             </div>
@@ -347,8 +361,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     await Parse.Cloud.run('deleteUser');
                     alert('Sua conta foi apagada.');
+                    await Parse.User.logOut();
                     window.location.hash = '#/register';
-                    router();
                 } catch (error) {
                     alert(`Erro ao apagar a conta: ${error.message}`);
                 }
