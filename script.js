@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const PARSE_APPLICATION_ID = 'SEU_APPLICATION_ID';
-    const PARSE_JAVASCRIPT_KEY = 'SEU_JAVASCRIPT_KEY';
+    const PARSE_APPLICATION_ID = 'vwERUrKW0buteCUne3RHmp74WJs0AO31HmSCvkUr';
+    const PARSE_JAVASCRIPT_KEY = 'uDLwcLXl6oVAb4z5aXJx8xKMqX1h7MoiK8CfNY1l';
     const PARSE_HOST_URL = 'https://parseapi.back4app.com/';
 
     Parse.initialize(PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
