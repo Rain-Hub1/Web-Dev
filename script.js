@@ -138,10 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderHome() {
-        if (!Parse.User.current()) {
-            window.location.hash = '#/login';
-            return;
-        }
         appRoot.innerHTML = `
             <div>
                 <h1 class="page-title">Arquivos Recentes</h1>
@@ -230,10 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderFileDetails(fileId) {
-        if (!Parse.User.current()) {
-            window.location.hash = '#/login';
-            return;
-        }
         const query = new Parse.Query("File");
         query.include("owner");
         try {
