@@ -37,22 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function router() {
-        const oldRawContent = document.getElementById('raw-content');
-        if (oldRawContent) {
-            oldRawContent.remove();
-        }
-        document.querySelector('header').style.display = 'block';
-        document.querySelector('main').style.display = 'block';
-
         const fullHash = window.location.hash || '#/home';
-
-        if (fullHash.endsWith('/raw/')) {
-            const urlParts = fullHash.replace('/raw/', '').split('?=');
-            const fileId = urlParts[1];
-            renderRawFile(fileId);
-            return;
-        }
-
         const [path, query] = fullHash.split('?=');
         const routeHandler = routes[path] || routes['#/home'];
         appRoot.innerHTML = '';
@@ -78,28 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         await Parse.User.logOut();
         window.location.hash = '#/login';
     });
-
-    async function renderRawFile(fileId) {
-        document.querySelector('header').style.display = 'none';
-        document.querySelector('main').style.display = 'none';
-
-        const File = Parse.Object.extend("File");
-        const query = new Parse.Query(File);
-
-        try {
-            const file = await query.get(fileId);
-            const codeContent = file.get('code');
-            const preElement = document.createElement('pre');
-            preElement.id = 'raw-content';
-            preElement.textContent = codeContent;
-            document.body.appendChild(preElement);
-        } catch (error) {
-            const errorElement = document.createElement('pre');
-            errorElement.id = 'raw-content';
-            errorElement.textContent = `Error: File not found or permission denied.\nID: ${fileId}`;
-            document.body.appendChild(errorElement);
-        }
-    }
 
     function renderLogin() {
         if (Parse.User.current()) {
@@ -270,12 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const owner = file.get('owner');
             const currentUser = Parse.User.current();
             const isOwner = currentUser && owner && currentUser.id === owner.id;
-            const rawUrl = `/#/File/Id?=${file.id}/raw/`;
+            const rawUrl = `${Parse.serverURL.replace('/parse', '')}/functions/getRawFile?id=${file.id}`;
             appRoot.innerHTML = `
                 <div class="page-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                         <h2 class="page-title" style="border: none; margin: 0;">${file.get('title')}</h2>
-                        <div class="button-group" id="actions-container">
+                        <div class="button-group" id="actions-container" style="margin-top: 0;">
                             <a href="${rawUrl}" target="_blank" class="button">Raw</a>
                         </div>
                     </div>
