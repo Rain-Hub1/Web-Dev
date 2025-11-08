@@ -202,17 +202,25 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         document.getElementById('new-file-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const File = Parse.Object.extend("File");
-            const file = new File();
-            const currentUser = Parse.User.current();
-            const acl = new Parse.ACL(currentUser);
-            acl.setPublicReadAccess(true);
-            file.set("title", document.getElementById('title').value);
-            file.set("description", document.getElementById('description').value);
-            file.set("code", document.getElementById('code').value);
-            file.set("owner", currentUser);
-            file.setACL(acl);
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const code = document.getElementById('code').value;
             try {
+                const gistResult = await Parse.Cloud.run('createGistForFile', {
+                    code: code,
+                    description: title,
+                    fileName: title.replace(/\s+/g, '-') + '.txt'
+                });
+                const File = Parse.Object.extend("File");
+                const file = new File();
+                const currentUser = Parse.User.current();
+                const acl = new Parse.ACL(currentUser);
+                acl.setPublicReadAccess(true);
+                file.set("title", title);
+                file.set("description", description);
+                file.set("rawUrl", gistResult.rawUrl);
+                file.set("owner", currentUser);
+                file.setACL(acl);
                 const savedFile = await file.save();
                 window.location.hash = `#/File/Id?=${savedFile.id}`;
             } catch (error) {
@@ -233,7 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const owner = file.get('owner');
             const currentUser = Parse.User.current();
             const isOwner = currentUser && owner && currentUser.id === owner.id;
-            const rawUrl = `https://parseapi.back4app.com/functions/getRawFile?id=${file.id}`;
+            const rawUrl = file.get('rawUrl');
+            const codeResponse = await fetch(rawUrl);
+            const codeContent = await codeResponse.text();
             appRoot.innerHTML = `
                 <div class="page-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -244,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <p style="color: var(--color-fg-muted); margin-top: 4px; margin-bottom: 16px;">Por: ${owner?.get('username') || 'Desconhecido'}</p>
                     <p>${file.get('description')}</p>
-                    <pre style="background-color: #010409; padding: 16px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word;"><code>${file.get('code')}</code></pre>
+                    <pre style="background-color: #010409; padding: 16px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word;"><code>${codeContent}</code></pre>
                 </div>`;
             if (isOwner) {
                 const actionsContainer = document.getElementById('actions-container');
@@ -280,6 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.hash = `#/File/Id?=${fileId}`;
                 return;
             }
+            const rawUrl = file.get('rawUrl');
+            const codeResponse = await fetch(rawUrl);
+            const codeContent = await codeResponse.text();
             appRoot.innerHTML = `
                 <div class="page-container">
                     <h2 class="page-title">Editar Arquivo</h2>
@@ -294,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="form-group">
                             <label for="code">Código</label>
-                            <textarea id="code" rows="10" style="font-family: monospace;">${file.get('code')}</textarea>
+                            <textarea id="code" rows="10" style="font-family: monospace;">${codeContent}</textarea>
                         </div>
                         <div class="button-group">
                             <button type="submit" class="button button-primary">Salvar</button>
@@ -305,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 file.set("title", document.getElementById('title').value);
                 file.set("description", document.getElementById('description').value);
-                file.set("code", document.getElementById('code').value);
                 try {
                     await file.save();
                     window.location.hash = `#/File/Id?=${file.id}`;
