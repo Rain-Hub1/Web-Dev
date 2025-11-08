@@ -201,12 +201,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
             const code = document.getElementById('code').value;
+            
+            const params = {
+                code: code,
+                description: title,
+                fileName: title.replace(/\s+/g, '-') + '.txt'
+            };
+
             try {
-                const gistResult = await Parse.Cloud.run('createGistForFile', {
-                    code: code,
-                    description: title,
-                    fileName: title.replace(/\s+/g, '-') + '.txt'
-                });
+                const gistResult = await Parse.Cloud.run('createGistForFile', params);
+                
                 const File = Parse.Object.extend("File");
                 const file = new File();
                 const currentUser = Parse.User.current();
