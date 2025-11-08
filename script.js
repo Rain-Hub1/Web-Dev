@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const owner = file.get('owner');
             const currentUser = Parse.User.current();
             const isOwner = currentUser && owner && currentUser.id === owner.id;
-            const rawUrl = `${Parse.serverURL.replace('/parse', '')}/functions/getRawFile?id=${file.id}`;
+            const rawUrl = `https://parseapi.back4app.com/functions/getRawFile?id=${file.id}`;
             appRoot.innerHTML = `
                 <div class="page-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
