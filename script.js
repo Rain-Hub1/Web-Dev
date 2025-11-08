@@ -37,7 +37,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function router() {
+        const oldRawContent = document.getElementById('raw-content');
+        if (oldRawContent) {
+            oldRawContent.remove();
+        }
+        document.querySelector('header').style.display = 'block';
+        document.querySelector('main').style.display = 'block';
+
         const fullHash = window.location.hash || '#/home';
+
+        if (fullHash.endsWith('/raw/')) {
+            const urlParts = fullHash.replace('/raw/', '').split('?=');
+            const fileId = urlParts[1];
+            renderRawFile(fileId);
+            return;
+        }
+
         const [path, query] = fullHash.split('?=');
         const routeHandler = routes[path] || routes['#/home'];
         appRoot.innerHTML = '';
@@ -63,6 +78,28 @@ document.addEventListener('DOMContentLoaded', () => {
         await Parse.User.logOut();
         window.location.hash = '#/login';
     });
+
+    async function renderRawFile(fileId) {
+        document.querySelector('header').style.display = 'none';
+        document.querySelector('main').style.display = 'none';
+
+        const File = Parse.Object.extend("File");
+        const query = new Parse.Query(File);
+
+        try {
+            const file = await query.get(fileId);
+            const codeContent = file.get('code');
+            const preElement = document.createElement('pre');
+            preElement.id = 'raw-content';
+            preElement.textContent = codeContent;
+            document.body.appendChild(preElement);
+        } catch (error) {
+            const errorElement = document.createElement('pre');
+            errorElement.id = 'raw-content';
+            errorElement.textContent = `Error: File not found or permission denied.\nID: ${fileId}`;
+            document.body.appendChild(errorElement);
+        }
+    }
 
     function renderLogin() {
         if (Parse.User.current()) {
@@ -123,15 +160,16 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const user = new Parse.User();
-            user.set('username', document.getElementById('username').value);
-            user.set('email', document.getElementById('email').value);
-            user.set('password', document.getElementById('password').value);
             try {
+                await Parse.User.logOut();
+                const user = new Parse.User();
+                user.set('username', document.getElementById('username').value);
+                user.set('email', document.getElementById('email').value);
+                user.set('password', document.getElementById('password').value);
                 await user.signUp();
                 window.location.hash = '#/home';
             } catch (error) {
-                alert(`Error: ${error.message}`);
+                alert(`Error during registration: ${error.message}`);
             }
         });
     }
@@ -232,16 +270,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const owner = file.get('owner');
             const currentUser = Parse.User.current();
             const isOwner = currentUser && owner && currentUser.id === owner.id;
+            const rawUrl = `/#/File/Id?=${file.id}/raw/`;
             appRoot.innerHTML = `
                 <div class="page-container">
-                    <h2 class="page-title">${file.get('title')}</h2>
-                    <p style="color: var(--color-fg-muted); margin-top: -8px; margin-bottom: 16px;">Por: ${owner?.get('username') || 'Desconhecido'}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <h2 class="page-title" style="border: none; margin: 0;">${file.get('title')}</h2>
+                        <div class="button-group" id="actions-container">
+                            <a href="${rawUrl}" target="_blank" class="button">Raw</a>
+                        </div>
+                    </div>
+                    <p style="color: var(--color-fg-muted); margin-top: 4px; margin-bottom: 16px;">Por: ${owner?.get('username') || 'Desconhecido'}</p>
                     <p>${file.get('description')}</p>
                     <pre style="background-color: #010409; padding: 16px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word;"><code>${file.get('code')}</code></pre>
-                    <div class="button-group" id="actions-container"></div>
                 </div>`;
             if (isOwner) {
-                document.getElementById('actions-container').innerHTML = `
+                const actionsContainer = document.getElementById('actions-container');
+                actionsContainer.innerHTML += `
                     <a href="#/Edit/Id?=${file.id}" class="button button-primary">Editar</a>
                     <button id="delete-button" class="button button-danger">Apagar</button>`;
                 document.getElementById('delete-button').addEventListener('click', async () => {
